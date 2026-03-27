@@ -5,7 +5,18 @@
   "projectType": "library",
   "tags": ["scope:infrastructure"],
   "targets": {
+    "prisma-generate": {
+      "executor": "nx:run-commands",
+      "outputs": [
+        "{workspaceRoot}/libs/infrastructure/src/generated/prisma"
+      ],
+      "options": {
+        "command": "npx prisma generate --config=libs/infrastructure/prisma/prisma.config.ts",
+        "cwd": "{workspaceRoot}"
+      }
+    },
     "build": {
+      "dependsOn": ["prisma-generate"],
       "executor": "@nx/js:tsc",
       "outputs": ["{options.outputPath}"],
       "options": {

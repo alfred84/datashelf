@@ -9,6 +9,11 @@ on:
 jobs:
   main:
     runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: postgresql://datashelf:datashelf@localhost:5432/datashelf_test?schema=public
+      REDIS_HOST: localhost
+      REDIS_PORT: 6379
+      JWT_SECRET: test-secret
     services:
       postgres:
         image: postgres:16-alpine
@@ -45,6 +50,9 @@ jobs:
 
       - run: npm ci
 
+      - name: Generate Prisma client
+        run: npm run db:generate
+
       - uses: nrwl/nx-set-shas@v4
 
       - name: Lint
@@ -52,11 +60,6 @@ jobs:
 
       - name: Test
         run: npx nx run-many -t test --parallel=3 --coverage
-        env:
-          DATABASE_URL: postgresql://datashelf:datashelf@localhost:5432/datashelf_test?schema=public
-          REDIS_HOST: localhost
-          REDIS_PORT: 6379
-          JWT_SECRET: test-secret
 
       - name: Build
         run: npx nx run-many -t build --parallel=3
