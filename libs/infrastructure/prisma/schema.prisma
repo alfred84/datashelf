@@ -1,0 +1,61 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  files File[]
+
+  @@map("users")
+}
+
+enum FileStatus {
+  UPLOADED
+  QUEUED
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+model File {
+  id           String     @id @default(uuid())
+  userId       String     @map("user_id")
+  originalName String     @map("original_name")
+  displayName  String     @map("display_name")
+  storagePath  String     @map("storage_path")
+  sizeBytes    Int        @map("size_bytes")
+  status       FileStatus @default(UPLOADED)
+  uploadedAt   DateTime   @default(now()) @map("uploaded_at")
+  updatedAt    DateTime   @updatedAt @map("updated_at")
+
+  user   User    @relation(fields: [userId], references: [id])
+  report Report?
+
+  @@map("files")
+}
+
+model Report {
+  id                String   @id @default(uuid())
+  fileId            String   @unique @map("file_id")
+  rowCount          Int      @map("row_count")
+  columnCount       Int      @map("column_count")
+  columnNames       Json     @map("column_names")
+  columnTypes       Json     @map("column_types")
+  emptyCountPerColumn Json   @map("empty_count_per_column")
+  previewRows       Json     @map("preview_rows")
+  errorMessage      String?  @map("error_message")
+  createdAt         DateTime @default(now()) @map("created_at")
+
+  file File @relation(fields: [fileId], references: [id])
+
+  @@map("reports")
+}
