@@ -1,1 +1,46 @@
+# Local cache directories
+.angular/
+.nx/cache/
+.nx/workspace-data/
+
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+out-tsc/
+tmp/
+
+# Coverage
+coverage/
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# IDE
+.idea/
+.vscode/
 /.cursor/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Nx
+.nx/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Prisma
+libs/infrastructure/src/generated/
+libs/infrastructure/prisma/migrations/**/migration_lock.toml
+
+# Uploads
+uploads/
+
+# Docs
+/docs/technical-test.md
