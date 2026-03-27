@@ -1,0 +1,57 @@
+services:
+  - type: web
+    name: datashelf-api
+    runtime: node
+    buildCommand: npm ci && npx prisma generate --schema=libs/infrastructure/prisma/schema.prisma && npx nx build api --configuration=production
+    startCommand: node dist/apps/api/main.js
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: datashelf-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: API_PORT
+        value: 3000
+      - key: UPLOAD_DIR
+        value: /tmp/uploads
+      - key: REDIS_HOST
+        fromService:
+          name: datashelf-redis
+          type: redis
+          property: host
+      - key: REDIS_PORT
+        fromService:
+          name: datashelf-redis
+          type: redis
+          property: port
+    healthCheckPath: /api/health
+
+  - type: worker
+    name: datashelf-worker
+    runtime: node
+    buildCommand: npm ci && npx prisma generate --schema=libs/infrastructure/prisma/schema.prisma && npx nx build worker --configuration=production
+    startCommand: node dist/apps/worker/main.js
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: datashelf-db
+          property: connectionString
+      - key: UPLOAD_DIR
+        value: /tmp/uploads
+      - key: REDIS_HOST
+        fromService:
+          name: datashelf-redis
+          type: redis
+          property: host
+      - key: REDIS_PORT
+        fromService:
+          name: datashelf-redis
+          type: redis
+          property: port
+
+databases:
+  - name: datashelf-db
+    plan: free
+    databaseName: datashelf
+    user: datashelf
