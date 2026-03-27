@@ -1,0 +1,62 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  main:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: datashelf
+          POSTGRES_PASSWORD: datashelf
+          POSTGRES_DB: datashelf_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: 'npm'
+
+      - run: npm ci
+
+      - uses: nrwl/nx-set-shas@v4
+
+      - name: Lint
+        run: npx nx run-many -t lint --parallel=3
+
+      - name: Test
+        run: npx nx run-many -t test --parallel=3 --coverage
+        env:
+          DATABASE_URL: postgresql://datashelf:datashelf@localhost:5432/datashelf_test?schema=public
+          REDIS_HOST: localhost
+          REDIS_PORT: 6379
+          JWT_SECRET: test-secret
+
+      - name: Build
+        run: npx nx run-many -t build --parallel=3
