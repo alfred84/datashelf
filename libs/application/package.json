@@ -1,0 +1,15 @@
+{
+  "name": "@datashelf/application",
+  "version": "0.0.1",
+  "private": true,
+  "type": "commonjs",
+  "main": "./src/index.js",
+  "types": "./src/index.d.ts",
+  "dependencies": {
+    "@datashelf/domain": "0.0.1",
+    "@datashelf/shared": "0.0.1",
+    "uuid": "*",
+    "csv-parse": "*",
+    "tslib": "^2.3.0"
+  }
+}
