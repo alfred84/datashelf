@@ -1,0 +1,111 @@
+<app-page-container title="My Files" subtitle="Upload and manage your CSV files">
+  <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <input
+      type="text"
+      placeholder="Search files..."
+      [ngModel]="searchQuery()"
+      (ngModelChange)="searchQuery.set($event)"
+      class="w-full rounded-lg border border-border bg-surface-raised px-3.5 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 shadow-sm focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none transition-colors sm:max-w-xs"
+    />
+    <label
+      class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-lg bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-primary-700 disabled:pointer-events-none disabled:opacity-50"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+      </svg>
+      {{ uploading() ? 'Uploading...' : 'Upload CSV' }}
+      <input
+        type="file"
+        accept=".csv"
+        (change)="onFileSelected($event)"
+        [disabled]="uploading()"
+        class="hidden"
+      />
+    </label>
+  </div>
+
+  @if (error()) {
+    <app-alert type="error" class="mb-4 block">{{ error() }}</app-alert>
+  }
+
+  @if (filteredFiles().length === 0) {
+    <app-empty-state title="No files yet" description="Upload a CSV file to get started with data analysis.">
+      <label class="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-primary-700">
+        Upload your first file
+        <input type="file" accept=".csv" (change)="onFileSelected($event)" class="hidden" />
+      </label>
+    </app-empty-state>
+  } @else {
+    <app-card padding="none">
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-border">
+          <thead>
+            <tr class="bg-surface-overlay">
+              <th class="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-muted">Name</th>
+              <th class="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-muted">Size</th>
+              <th class="hidden px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-muted sm:table-cell">Uploaded</th>
+              <th class="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-muted">Status</th>
+              <th class="px-6 py-3.5 text-right text-xs font-semibold uppercase tracking-wider text-muted">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-border">
+            @for (file of filteredFiles(); track file.id) {
+              <tr class="transition-colors hover:bg-surface-overlay/60">
+                <td class="whitespace-nowrap px-6 py-4">
+                  @if (editingId() === file.id) {
+                    <div class="flex items-center gap-2">
+                      <input
+                        [(ngModel)]="editName"
+                        (keyup.enter)="saveRename(file.id)"
+                        (keyup.escape)="cancelRename()"
+                        class="rounded-md border border-border px-2.5 py-1.5 text-sm focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none"
+                      />
+                      <button (click)="saveRename(file.id)" class="text-sm font-medium text-success-500 hover:text-success-700 transition-colors">Save</button>
+                      <button (click)="cancelRename()" class="text-sm text-muted hover:text-gray-700 transition-colors">Cancel</button>
+                    </div>
+                  } @else {
+                    <div class="flex items-center gap-2">
+                      <span class="text-sm font-medium text-gray-900">{{ file.displayName }}</span>
+                      <button
+                        (click)="startRename(file)"
+                        class="rounded p-0.5 text-muted opacity-0 transition-all hover:bg-gray-100 hover:text-primary-600 group-hover:opacity-100 [tr:hover_&]:opacity-100"
+                        title="Rename"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>
+                        </svg>
+                      </button>
+                    </div>
+                  }
+                </td>
+                <td class="whitespace-nowrap px-6 py-4 text-sm text-muted">{{ formatSize(file.sizeBytes) }}</td>
+                <td class="hidden whitespace-nowrap px-6 py-4 text-sm text-muted sm:table-cell">{{ file.uploadedAt | date:'short' }}</td>
+                <td class="whitespace-nowrap px-6 py-4">
+                  <app-status-badge [status]="file.status" />
+                </td>
+                <td class="whitespace-nowrap px-6 py-4 text-right text-sm">
+                  @if (file.status === 'COMPLETED') {
+                    <a
+                      [routerLink]="['/files', file.id, 'report']"
+                      class="font-semibold text-primary-600 hover:text-primary-700 transition-colors"
+                    >
+                      View Report
+                    </a>
+                  }
+                  @if (file.status === 'FAILED') {
+                    <button (click)="retryFile(file.id)" class="font-semibold text-warning-500 hover:text-warning-700 transition-colors">
+                      Retry
+                    </button>
+                  }
+                  @if (file.status === 'PROCESSING' || file.status === 'QUEUED') {
+                    <span class="animate-pulse text-sm text-muted">Processing...</span>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </app-card>
+  }
+</app-page-container>

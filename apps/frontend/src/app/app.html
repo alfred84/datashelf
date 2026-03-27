@@ -1,0 +1,32 @@
+<div class="min-h-screen bg-surface">
+  <header class="sticky top-0 z-40 border-b border-border bg-surface-raised/80 backdrop-blur-md">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="flex h-16 items-center justify-between">
+        <a routerLink="/files" class="flex items-center gap-2 text-lg font-bold tracking-tight text-primary-600">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/>
+            <path d="M8 10v4"/><path d="M12 10v4"/><path d="M16 10v4"/>
+          </svg>
+          DataShelf
+        </a>
+
+        @if (isLoggedIn()) {
+          <div class="flex items-center gap-3">
+            <span class="hidden text-sm font-medium text-muted sm:inline-block">{{ userEmail() }}</span>
+            <div class="h-5 w-px bg-border"></div>
+            <button
+              (click)="logout()"
+              class="rounded-md px-3 py-1.5 text-sm font-medium text-danger-500 transition-colors hover:bg-danger-50 hover:text-danger-700"
+            >
+              Sign out
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+  </header>
+
+  <main class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <router-outlet />
+  </main>
+</div>
