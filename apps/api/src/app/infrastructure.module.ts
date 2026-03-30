@@ -12,6 +12,10 @@ import {
 import { INJECTION_TOKENS } from '@datashelf/shared';
 
 const prismaClient = getPrismaClient();
+const jwtExpiresInSeconds = Number.parseInt(
+  process.env['JWT_EXPIRES_IN_SECONDS'] || '86400',
+  10
+);
 
 @Global()
 @Module({
@@ -41,7 +45,7 @@ const prismaClient = getPrismaClient();
       useFactory: () =>
         new JwtTokenService(
           process.env['JWT_SECRET'] || 'default-secret',
-          86400
+          Number.isNaN(jwtExpiresInSeconds) ? 86400 : jwtExpiresInSeconds
         ),
     },
     {
@@ -53,7 +57,7 @@ const prismaClient = getPrismaClient();
       provide: INJECTION_TOKENS.JOB_QUEUE,
       useFactory: () =>
         new BullMQJobQueueAdapter(
-          process.env['REDIS_HOST'] || 'localhost',
+          process.env['REDIS_HOST'] || 'redis',
           parseInt(process.env['REDIS_PORT'] || '6379', 10)
         ),
     },
