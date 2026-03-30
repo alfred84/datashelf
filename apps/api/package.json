@@ -1,0 +1,32 @@
+{
+  "name": "api",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "@datashelf/application": "0.0.1",
+    "@datashelf/domain": "0.0.1",
+    "@datashelf/infrastructure": "0.0.1",
+    "@datashelf/shared": "0.0.1",
+    "@nestjs/common": "^11.0.0",
+    "@nestjs/core": "^11.0.0",
+    "@nestjs/jwt": "^11.0.2",
+    "@nestjs/passport": "^11.0.5",
+    "@nestjs/platform-express": "^11.0.0",
+    "@prisma/adapter-pg": "^7.5.0",
+    "@prisma/client": "^7.5.0",
+    "bcrypt": "^6.0.0",
+    "bullmq": "^5.71.0",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.15.1",
+    "csv-parse": "^6.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "multer": "^2.1.1",
+    "passport": "^0.7.0",
+    "passport-jwt": "^4.0.1",
+    "pg": "^8.20.0",
+    "prisma": "^7.5.0",
+    "reflect-metadata": "^0.1.13",
+    "rxjs": "^7.8.0",
+    "uuid": "^13.0.0"
+  }
+}

@@ -12,14 +12,13 @@ FROM node:24-alpine
 WORKDIR /app
 COPY --from=builder /app/dist/apps/api .
 RUN npm ci --omit=dev
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
-RUN mkdir -p /app/uploads && chown -R appuser:appgroup /app
 COPY --from=builder /app/libs/infrastructure/prisma libs/infrastructure/prisma
-COPY --from=builder /app/node_modules/.prisma node_modules/.prisma
-COPY --from=builder /app/node_modules/prisma node_modules/prisma
-COPY --from=builder /app/node_modules/@prisma node_modules/@prisma
 COPY --from=builder /app/apps/api/entrypoint.sh /app/entrypoint.sh
-RUN chmod +x /app/entrypoint.sh
+RUN addgroup -S appgroup \
+  && adduser -S appuser -G appgroup \
+  && mkdir -p /app/uploads \
+  && chown -R appuser:appgroup /app \
+  && chmod +x /app/entrypoint.sh
 USER appuser
 EXPOSE 3000
 ENTRYPOINT ["/app/entrypoint.sh"]
