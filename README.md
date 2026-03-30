@@ -27,7 +27,7 @@ cd datashelf
 # Install dependencies
 npm install
 
-# Start full stack (postgres + redis + api + web)
+# Start full stack (postgres + redis + api + worker + web)
 npm run docker:up
 ```
 
@@ -41,11 +41,7 @@ The application will be available at:
 - **Frontend**: http://localhost:4200
 - **API**: http://localhost:3000
 
-Optional worker startup:
-
-```bash
-docker compose --env-file .env.docker --profile worker up --build
-```
+The **worker** (BullMQ) starts with the same command so CSV jobs are processed. It waits until the API is healthy so Prisma migrations have run.
 
 Useful Docker commands:
 
@@ -56,7 +52,7 @@ npm run docker:down
 
 Notes:
 - `apps/api/entrypoint.sh` runs `prisma migrate deploy` on startup (idempotent and safe).
-- Service-to-server traffic uses Docker DNS (`postgres`, `redis`, `api`, `web`).
+- Compose services share one network (`postgres`, `redis`, `api`, `worker`, `web`).
 - `FRONTEND_URL` in `.env.docker` must match the URL users open in the browser (default `http://localhost:4200`), not the `web` service hostname—otherwise the API CORS check will reject requests.
 - Docker environment defaults live in `.env.docker`; local development can still use `.env`.
 
