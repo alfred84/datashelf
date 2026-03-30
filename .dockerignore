@@ -1,0 +1,12 @@
+node_modules
+dist
+coverage
+.nx
+.angular
+.git
+.cursor
+tmp
+uploads
+*.log
+.env
+.env.local
