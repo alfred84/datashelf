@@ -56,7 +56,8 @@ npm run docker:down
 
 Notes:
 - `apps/api/entrypoint.sh` runs `prisma migrate deploy` on startup (idempotent and safe).
-- Service-to-service communication uses Docker DNS (`postgres`, `redis`, `api`, `web`).
+- Service-to-server traffic uses Docker DNS (`postgres`, `redis`, `api`, `web`).
+- `FRONTEND_URL` in `.env.docker` must match the URL users open in the browser (default `http://localhost:4200`), not the `web` service hostname—otherwise the API CORS check will reject requests.
 - Docker environment defaults live in `.env.docker`; local development can still use `.env`.
 
 ## Project Structure
