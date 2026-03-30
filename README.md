@@ -27,37 +27,37 @@ cd datashelf
 # Install dependencies
 npm install
 
-# Start infrastructure (PostgreSQL + Redis)
-docker compose up postgres redis -d
-
-# Copy environment file
-cp .env.example .env
-
-# Run database migrations
-npx prisma migrate deploy --config=libs/infrastructure/prisma/prisma.config.ts
-
-# Generate Prisma client
-npx prisma generate --config=libs/infrastructure/prisma/prisma.config.ts
-
-# Start the API
-npx nx serve api
-
-# Start the worker (in another terminal)
-npx nx serve worker
-
-# Start the frontend (in another terminal)
-npx nx serve frontend
+# Start full stack (postgres + redis + api + web)
+npm run docker:up
 ```
 
 ## Docker (Full Stack)
 
 ```bash
-docker compose up --build
+npm run docker:up
 ```
 
 The application will be available at:
 - **Frontend**: http://localhost:4200
 - **API**: http://localhost:3000
+
+Optional worker startup:
+
+```bash
+docker compose --env-file .env.docker --profile worker up --build
+```
+
+Useful Docker commands:
+
+```bash
+npm run docker:logs
+npm run docker:down
+```
+
+Notes:
+- `apps/api/entrypoint.sh` runs `prisma migrate deploy` on startup (idempotent and safe).
+- Service-to-service communication uses Docker DNS (`postgres`, `redis`, `api`, `web`).
+- Docker environment defaults live in `.env.docker`; local development can still use `.env`.
 
 ## Project Structure
 
@@ -99,6 +99,10 @@ npx nx test application
 ## Environment Variables
 
 See [.env.example](.env.example) for all required environment variables.
+
+For containerized runs:
+- use `.env.docker` with Docker service hostnames
+- never commit local secrets in `.env`
 
 ## Documentation
 
