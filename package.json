@@ -3,6 +3,9 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
+    "docker:up": "docker compose --env-file .env.docker up --build",
+    "docker:down": "docker compose --env-file .env.docker down",
+    "docker:logs": "docker compose --env-file .env.docker logs -f",
     "db:generate": "npx prisma generate --config=libs/infrastructure/prisma/prisma.config.ts",
     "db:migrate": "npx prisma migrate deploy --config=libs/infrastructure/prisma/prisma.config.ts",
     "db:migrate:dev": "npx prisma migrate dev --config=libs/infrastructure/prisma/prisma.config.ts",
