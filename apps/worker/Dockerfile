@@ -11,6 +11,11 @@ RUN npx nx prune worker
 FROM node:24-alpine
 WORKDIR /app
 COPY --from=builder /app/dist/apps/worker .
-RUN rm -f package-lock.json && npm install --omit=dev
-RUN mkdir -p /app/uploads
+COPY --from=builder /app/libs/infrastructure/prisma libs/infrastructure/prisma
+RUN npm ci --omit=dev
+RUN addgroup -S appgroup \
+  && adduser -S appuser -G appgroup \
+  && mkdir -p /app/uploads \
+  && chown -R appuser:appgroup /app
+USER appuser
 CMD ["node", "main.js"]

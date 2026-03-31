@@ -11,7 +11,7 @@ RUN npx nx prune api
 FROM node:24-alpine
 WORKDIR /app
 COPY --from=builder /app/dist/apps/api .
-RUN rm -f package-lock.json && npm install --omit=dev
+RUN npm ci --omit=dev
 COPY --from=builder /app/libs/infrastructure/prisma libs/infrastructure/prisma
 COPY --from=builder /app/apps/api/entrypoint.sh /app/entrypoint.sh
 RUN addgroup -S appgroup \
