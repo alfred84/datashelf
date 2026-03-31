@@ -8,10 +8,12 @@
   "dependencies": {
     "@datashelf/domain": "0.0.1",
     "@prisma/adapter-pg": "*",
+    "@prisma/client": "*",
     "bcrypt": "*",
     "bullmq": "*",
     "dotenv": "*",
     "jsonwebtoken": "*",
+    "pg": "*",
     "prisma": "*",
     "tslib": "^2.3.0"
   }
