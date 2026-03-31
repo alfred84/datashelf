@@ -7,11 +7,11 @@ COPY . .
 RUN npx prisma generate --config=libs/infrastructure/prisma/prisma.config.ts
 RUN npx nx build api --configuration=production
 RUN npx nx prune api
+RUN cd dist/apps/api && npm install --omit=dev
 
 FROM node:24-alpine
 WORKDIR /app
 COPY --from=builder /app/dist/apps/api .
-RUN npm ci --omit=dev
 COPY --from=builder /app/libs/infrastructure/prisma libs/infrastructure/prisma
 COPY --from=builder /app/apps/api/entrypoint.sh /app/entrypoint.sh
 RUN addgroup -S appgroup \
